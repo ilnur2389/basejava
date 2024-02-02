@@ -61,11 +61,7 @@ public class ArrayStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     Resume[] getAll() {
-        Resume[] allResumes = new Resume[storage.length];
-        // Копируем все элементы из storage в allResumes
-        System.arraycopy(storage, 0, allResumes, 0, storage.length);
-        //возвращаем массив с такими же значениями, как и в storage
-        return allResumes;
+        return storage;
     }
 
     int size() {
