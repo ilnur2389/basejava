@@ -1,45 +1,32 @@
-import java.io.OptionalDataException; /**
+import java.io.OptionalDataException;
+
+/**
  * Array based storage for Resumes
  */
 public class ArrayStorage {
     Resume[] storage = new Resume[10000];
 
     void clear() {
-        // Подсчет количества ненулевых элементов
-        int countNonNull = 0;
-        for (Resume element : storage) {
-            if (element != null) {
-                countNonNull++;
-            }
+        for (int i = 0; i < storage.length; i++) {
+            storage[i] = null;
         }
-        // Создание нового массива без null элементов
-        Resume[] newArray = new Resume[countNonNull];
-        int index = 0;
-        for (Resume element : storage) {
-            if (element != null) {
-                newArray[index++] = element;
-            }
-        }
-        // Присваиваем newArray в storage
-        storage = newArray;
     }
 
-    void  save(Resume userID) {
-        if (userID != null){
-            Resume[] newArray = new Resume[storage.length + 1];
-            //Сохраняем r в начало нового массива
-            newArray[0] = userID;
-            // Копируем содержимое storage в newArray начиная с индекса 1
-            System.arraycopy(storage, 0, newArray, 1, storage.length);
-            // Присваиваем newArray в storage
-            storage = newArray;
+    void save(Resume userID) {
+        if (userID != null) {
+            // Сдвигаем существующие элементы вправо
+            for (int i = storage.length - 1; i > 0; i--) {
+                storage[i] = storage[i - 1];
+            }
+            // Сохраняем новый элемент в начало массива
+            storage[0] = userID;
         }
     }
 
     Resume get(String uuid) {
         //Ищем совпадающие значения uuid и элементов storage, если такие имеются, то возвращаем
-        for (Resume result : storage){
-            if(result!=null && uuid.equals(result.uuid)){
+        for (Resume result : storage) {
+            if (result != null && uuid.equals(result.uuid)) {
                 return result;
             }
         }
@@ -49,25 +36,25 @@ public class ArrayStorage {
 
     void delete(String uuid) {
         int arrayLength = 0;
-
+        // Подсчет количества элементов, не совпадающих с заданным uuid
         for (Resume result : storage) {
-            if (!uuid.equals(result.uuid)) {
+            if (result == null || !uuid.equals(result.uuid)) {
                 arrayLength++;
             }
         }
-        Resume[] newArray = new Resume[arrayLength];
-        int index = 0;
-        //Ищем совпадающие значения uuid и элементов storage
-        for (Resume result : storage) {
-            if (result != null && !uuid.equals(result.uuid)) {
-                newArray[index++] = result;
+        // Сдвигаем элементы влево, убирая те, у которых uuid совпадает
+        int currentIndex = 0;
+        for (int i = 0; i < storage.length; i++) {
+            if (storage[i] != null && uuid.equals(storage[i].uuid)) {
+                continue; // Пропускаем элементы, которые нужно удалить
             }
+            storage[currentIndex++] = storage[i];
         }
-
-        // Присваиваем newArray в storage
-        storage = newArray;
+        // Заполняем "лишние" элементы массива null
+        for (int i = currentIndex; i < storage.length; i++) {
+            storage[i] = null;
+        }
     }
-
 
 
     /**
@@ -83,6 +70,12 @@ public class ArrayStorage {
 
     int size() {
         //Возвращаем длину массива
-        return storage.length;
+        int count = 0;
+        for (int i = 0; i < storage.length; i++) {
+            if (storage[i] != null) {
+                count += 1;
+            }
+        }
+        return count;
     }
 }
